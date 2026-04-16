@@ -18,6 +18,17 @@ The first component of this project establishes a simple one-round communication
 
 No threading or external libraries are required — only Python's standard `socket` module.
 
+## Part 2 – Continuous Chat with Multithreading
+
+The second component expands on Part 1 by keeping both the client and server online after each message, allowing them to chat indefinitely:
+
+- Both the **client** and **server** remain connected after each message is sent.
+- Either side can send **multiple messages in a row** without waiting for a reply.
+- **Multithreading** is used to handle sending and receiving simultaneously — one thread listens for incoming messages while the other waits for user input.
+- The chat continues until the connection is manually terminated.
+
+Uses Python's standard `socket` and `threading` modules.
+
 ## Requirements
 
 - Python 3.x
