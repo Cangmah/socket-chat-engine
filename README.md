@@ -29,6 +29,17 @@ The second component expands on Part 1 by keeping both the client and server onl
 
 Uses Python's standard `socket` and `threading` modules.
 
+## Part 3 – Group Chat with Multiple Clients
+
+The third component redesigns the server into a pure message relay — the server no longer participates in the chat, it only routes messages between connected clients:
+
+- The **server** accepts multiple clients simultaneously and relays every message to all connected clients.
+- The **server** has no user input — it only listens and broadcasts.
+- The **client** program is the same for all users — simply run the same `client.py` multiple times to simulate multiple users.
+- Every message sent by one client is shown to **all connected clients** (group chat).
+
+Uses Python's standard `socket` and `threading` modules.
+
 ## Requirements
 
 - Python 3.x
