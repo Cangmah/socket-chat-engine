@@ -39,5 +39,5 @@ server_sock.listen(10) #socket is open for up to 10 connections
 try:
     clients(server_sock)
 except KeyboardInterrupt:
-    print("Server shutting down...goodbye")
+    print("\nServer shutting down...goodbye")
     server_sock.close()
