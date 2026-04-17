@@ -1,7 +1,7 @@
 from socket import socket, AF_INET, SOCK_STREAM #importing socket, IPV4 addressing with TCP connection
-import threading #thread library to run send() and receive() simultaneously 
+import threading #thread library to connect each clients simultaneously 
 
-#empty list of clients storing their IP and Port
+#empty list of clients storing their socket and IP/Port
 client_list = []
 
 #function for accepting clients to server socket
