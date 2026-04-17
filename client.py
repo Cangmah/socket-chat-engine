@@ -1,5 +1,5 @@
 from socket import socket, AF_INET, SOCK_STREAM #import socket class and constants 
-import threading 
+import threading #use thread to send/receive messages to server simultaneously
 
 #client receiving message, continuously prints it unless quit 
 #use try/except to ensure smooth quit without receiver throwing error once socket closes
@@ -7,17 +7,17 @@ def receive(client_sock):
     while(True):
         try: 
             resp = client_sock.recv(1024) #receives 1KB of data from server
-            if (resp == b''):
+            if (resp == b''): #exit if no connection
                 client_sock.close()
                 break #if quit, stop receiving exit loop
-            print("Server message: ", resp.decode())
+            print( resp.decode()) #print decoded message
         except:
             break
 #client sends message to server continuously
 def send(client_sock):
     while(True):
-        message = input("Input Message: ")
-        if(message == 'quit' or message == ''):
+        message = input()
+        if(message == 'quit'):
             client_sock.close()
             break #exit loop if quit 
         try: #avoid error if socket has closed from server side using try/except, instead break cleanly

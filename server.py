@@ -1,51 +1,43 @@
 from socket import socket, AF_INET, SOCK_STREAM #importing socket, IPV4 addressing with TCP connection
 import threading #thread library to run send() and receive() simultaneously 
 
-#sending user's message to client 
-#send function to call via threading on client socket
-def send(csock):
-    while (True): #continuously sends user's input to client until user 'quit' the connection
-        message = input("Enter message: ") #prompts user for input
-        if (message == "quit"):
-            csock.close()
-            break
-        try: #use try/except incase client has closed sockets
-            csock.send(message.encode()) #send the message via client socket in bytes via .encode()
-        except:
-            break
-#receiving client's message to server on client socket
-#use try/except to ensure no error thrown by receiver once socket is closed
-def receive(csock):
-    while(True):
-        try: 
-            resp = csock.recv(1024) #receives up to 1KB of data/message from client
-            if (resp == b''): #if user input is quit or empty, end 
-                break 
-            print("Client message: ", resp.decode()) #print the message after decoding the bytes 
-        except:
+#empty list of clients storing their IP and Port
+client_list = []
+
+#function for accepting clients to server socket
+def clients(server_sock):
+    while (True): #continuously accept clients and add to the list of clients
+        client = server_sock.accept()
+        client_list.append(client) #add client both socket and address/port as tuple to the list
+        print("Client connected", client[1]) #print client's address/port
+        #create a thread for client to listen and broadcast message
+        threading.Thread(target=client_control, args=(client,)).start()
+
+#used by thread, controls the listening and broadcasting by a client from the client list
+
+def client_control(client):
+    while (True):
+        try: #try/except to ensure client is online, else remove from list and break
+            resp = client[0].recv(1024) #listens to the client using its socket from tuple[0]  list
+            if (resp == b''): client_list.remove(client);break #if client disconnects, remove from list and break
+            #Go through each client in the list, and send message to everyone but current client
+            for c in client_list:
+                if(c[1] != client[1]): #ensure message is sent to everyone in the list but current client itself
+                    c[0].send(f"{client[1]}: ".encode() + resp) #attach sender's address/port to the message(resp)
+
+        except: #if client disconnects or offline, remove from list of clients and break
+            client_list.remove(client)
             break
 
 #create a socket object using imported socket class
 server_sock = socket(AF_INET, SOCK_STREAM) 
 server_sock.bind(('localhost', 50000)) #bind/attaching the socket object to local machine on port 50000
-server_sock.listen(1) #socket is open for a single connection 
+server_sock.listen(10) #socket is open for up to 10 connections
 
-#waiting to accept client's connection 
-connection = server_sock.accept() #.accept() returns the socket to communicate with client and the (IP, Port) of client
-csock = connection[0] #socket to client
-caddr = connection[1] #address and port of client
-print("Connection successful with: ", caddr) #prints the address/port of client
-
-#creating two threads for sending and receiving messages to client 
-#target is the function name and args is the function argument as tuple
-t1 = threading.Thread(target=send, args=(csock,))
-t2 = threading.Thread(target=receive, args=(csock,))
-
-#start threads 
-t1.start()
-t2.start()
-#main waits for threads to exit before closing sockets 
-t1.join()
-t2.join()
-#close the socket 
-server_sock.close()
+#create thread for client
+#use try/except to account for shutting down server (ctrl+C)
+try:
+    clients(server_sock)
+except KeyboardInterrupt:
+    print("Server shutting down...goodbye")
+    server_sock.close()
