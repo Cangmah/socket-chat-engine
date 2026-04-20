@@ -50,20 +50,36 @@ Uses Python's standard `socket` and `threading` modules.
 ### Start the server
 
 ```bash
-python server.py
+python3 server.py
 ```
 
-The server will begin listening for a connection. Once connected, you will be prompted to type a message.
+The server will start listening for incoming client connections on port `50000`. It does not send messages — it only relays messages between connected clients.
 
-### Start the client
+### Start the clients
+
+Open a **separate terminal for each client** and run the same `client.py` file in each:
 
 ```bash
-python client.py
+python3 client.py
 ```
 
-The client will connect to the server. After receiving the server's message, you will be prompted to type a reply.
+To simulate a group chat on the same machine, open multiple terminals and run `client.py` in each one. Messages sent from one client will be broadcast to all other connected clients.
 
-> Both programs can be run on the same machine using `localhost` as the server address.
+### Running on two different machines
+
+To connect clients from a different machine, both machines must be on the **same network**.
+
+1. Find the server machine's local IP address:
+```bash
+networksetup -getinfo Wi-Fi
+```
+
+2. On the client machine, open `client.py` and update the `connect()` line with the server's IP address:
+```python
+client_sock.connect(('192.168.x.x', 50000))  # replace with server machine's IP
+```
+
+3. Run `server.py` on the server machine and `client.py` on the client machine — they will communicate over the local network.
 
 ## Project Structure
 
